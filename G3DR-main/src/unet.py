@@ -220,6 +220,52 @@ class Attention(nn.Module):
         return self.to_out(out)
 
 
+# class Unet(nn.Module):
+#     def __init__(
+#         self,
+#         dim,
+#         renderer,
+#         eg3d_decoder,
+#         rendering_options,
+#         init_dim = None,
+#         out_dim = None,
+#         dim_mults=(1, 2, 4, 8),
+#         channels = 3,
+#         self_condition = False,
+#         resnet_block_groups = 8,
+#         learned_variance = False,
+#         learned_sinusoidal_cond = False,
+#         random_fourier_features = False,
+#         learned_sinusoidal_dim = 16,
+#         render_3d = True,
+#         image_size = 128,
+#         config=None
+#     ):
+#         # super().__init__()
+#         super(Unet, self).__init__()
+#         in_channels = channels * (2 if self_condition else 1)
+#         self.encoder = nn.Sequential(
+#             nn.Conv2d(in_channels, 64, kernel_size=3, padding=1),
+#             nn.ReLU(inplace=True),
+#             nn.MaxPool2d(kernel_size=2, stride=2),
+#             nn.Conv2d(64, 128, kernel_size=3, padding=1),
+#             nn.ReLU(inplace=True),
+#             nn.MaxPool2d(kernel_size=2, stride=2)
+#         )
+#         out_channels = channels * (1 if not learned_variance else 2)
+#         self.decoder = nn.Sequential(
+#             nn.Conv2d(128, 64, kernel_size=3, padding=1),
+#             nn.ReLU(inplace=True),
+#             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False),
+#             nn.Conv2d(64, out_channels, kernel_size=3, padding=1)
+#         )
+
+#     def forward(self, x, return_3d_features=False, render=True):
+#         x = self.encoder(x)
+#         x = self.decoder(x)
+#         return x
+
+
 class Unet(nn.Module):
     def __init__(
         self,
@@ -243,6 +289,7 @@ class Unet(nn.Module):
     ):
         super().__init__()
 
+
         # determine dimensions
         self.renderer = renderer
         self.rendering_options = rendering_options
@@ -250,6 +297,7 @@ class Unet(nn.Module):
         self.channels = channels
         self.self_condition = self_condition
         self.render_3d = render_3d
+      
         input_channels = channels * (2 if self_condition else 1)
 
         self.add_pos_embed = True

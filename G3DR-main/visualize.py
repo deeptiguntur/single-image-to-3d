@@ -248,8 +248,8 @@ def main(config, args):
     # importing necessary function from Eg3D
     from training.volumetric_rendering.renderer import ImportanceRenderer, sample_from_planes, sample_from_3dgrid, generate_planes, math_utils, project_onto_planes
 
-    dim = 128
-    image_size = 128
+    dim = 32
+    image_size = 32
 
     rendering_kwargs = config['G3DR']['rendering']['triplane_renderer_config']['rendering_kwargs']
     mlp_decoder_config = config['G3DR']['rendering']['triplane_renderer_config']['mlp_decoder_config']
@@ -291,7 +291,11 @@ def main(config, args):
     if args.load_model!='default.pt':
         load_model = args.load_model
         checkpoint = torch.load(load_model, map_location='cpu')
-        state_dict = {k.partition('module.')[2]: checkpoint['model'][k] for k in checkpoint['model'].keys()}
+        # state_dict = {k.partition('module.')[2]: checkpoint['model'][k] for k in checkpoint['model'].keys()}
+        # print("Printing k")
+        # for k in checkpoint['model'].keys():
+        #     print(k)
+        state_dict = {k: checkpoint['model'][k] for k in checkpoint['model'].keys()}
         model.load_state_dict(state_dict)
         model.eval()
     else:

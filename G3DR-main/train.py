@@ -20,7 +20,7 @@ from torch.utils.tensorboard import SummaryWriter
 from accelerate import Accelerator
 
 from src import dataset_dict
-from src.unet import Unet, OSGDecoder_extended
+from src.unet import Unet, OSGDecoder_extended#, SimpleUNet
 from src.camera import compute_cam2world_matrix, sample_rays
 from src.utils import TensorGroup, count_parameters
 
@@ -51,6 +51,7 @@ def save(save_dir_checkpoints, step, model, opt, scheduler):
         'opt': opt.state_dict(),
         'scheduler': scheduler.state_dict(),
     }
+    print("Saving to ",str(save_dir_checkpoints + '/checkpoint_generic.pt'))
     torch.save(data, str(save_dir_checkpoints + '/checkpoint_generic.pt'))
 
 def tv_loss(img):
@@ -238,8 +239,10 @@ def main(config):
     sys.path.insert(0, config['G3DR']['rendering']['renderer_path'])
     from training.volumetric_rendering.renderer import ImportanceRenderer, sample_from_planes, sample_from_3dgrid, generate_planes, math_utils, project_onto_planes
 
-    dim = 128
-    image_size = 128
+    # dim = 128
+    dim = 32
+    image_size = 32
+    # image_size = 32
     accelerator = Accelerator()
     accelerator.free_memory()
 
@@ -314,10 +317,13 @@ def main(config):
         eg3d_decoder=eg3d_decoder,
         rendering_options=rendering_kwargs,
         dim_mults = (1, 2, 4, 8),
+        # dim_mults = (1, 2),
         render_3d=render_3d,
         image_size = image_size,
         config = config
     )
+
+    # model = SimpleUNet(dim, unet_out_dim)
 
     if not estimate_camera:
         model.rays_o = dataset.rays_o
@@ -401,9 +407,9 @@ def main(config):
                         x_canon_resize = x_canon
 
                     gt_normalized = znormalize(gt_input_img)
-                    clip_embed_gt = clip_model.module.encode_image(gt_normalized)
+                    clip_embed_gt = clip_model.encode_image(gt_normalized)
                     x_canon_normalized = znormalize(unnorm(x_canon_resize))
-                    clip_embed_x_canon = clip_model.module.encode_image(x_canon_normalized)
+                    clip_embed_x_canon = clip_model.encode_image(x_canon_normalized)
 
                     loss_fn2 = F.l1_loss
                     pred_imgs, pred_depth, gt_imgs, gt_depth = x_canon, depth, x_start, data['depth']
@@ -458,9 +464,9 @@ def main(config):
                         gt_input_img = data['images']
 
                     gt_normalized = znormalize(gt_input_img)
-                    clip_embed_gt = clip_model.module.encode_image(gt_normalized) 
+                    clip_embed_gt = clip_model.encode_image(gt_normalized) 
                     novel_normalized = znormalize(unnorm(x_novel))
-                    clip_embed_trans = clip_model.module.encode_image(novel_normalized) 
+                    clip_embed_trans = clip_model.encode_image(novel_normalized) 
 
                     loss_fn2 = F.l1_loss
                     

@@ -27,7 +27,6 @@ class Imagenet_Dataset:
             folder_names = os.listdir(folder)
             for f in folder_names:
                 self.image_names.extend(glob.glob(os.path.join(folder, f) + "/*.jpg"))
-                # print(self.image_names)
         print('Number of files: ', len(self.image_names))
         self.rotate = T.functional.rotate
         self.transform = T.Compose([
