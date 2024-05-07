@@ -7,12 +7,12 @@ G3DR:
     batch_size: 8
     save_and_sample_every: 500
     dataset: Imagenet
-    train_num_steps: 300000
-    dataset_folder: C:\Users\Deept\OneDrive\Desktop\Github\G3DR-main\G3DR-main\dataset
+    train_num_steps: 10
+    dataset_folder: C:\Users\Deept\OneDrive\Desktop\Github\single-image-to-3d\G3DR-main\dataset2
 
   rendering:
     render: True
-    renderer_path: C:\Users\Deept\OneDrive\Desktop\Github\G3DR-main\G3DR-main\eg3d-main\eg3d  # eg3d path
+    renderer_path: C:\Users\Deept\OneDrive\Desktop\Github\single-image-to-3d\G3DR-main\eg3d-main\eg3d  # eg3d path
     estimate_camera: False
     view_transform: True
     triplane_renderer_config:
@@ -36,7 +36,7 @@ G3DR:
 
 logging:
   version: supp_test
-  save_dir: \training_logs
+  save_dir: training_logs
 
 dataset_params:
   all_classes: True

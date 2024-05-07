@@ -47,7 +47,7 @@ def linear_high2low(step, start_value, final_value, start_iter, end_iter):
 def save(save_dir_checkpoints, step, model, opt, scheduler):
     data = {
         'step': step,
-        'model': model.module.state_dict(),
+        'model': model.state_dict(),
         'opt': opt.state_dict(),
         'scheduler': scheduler.state_dict(),
     }
@@ -287,9 +287,9 @@ def main(config):
                 os.makedirs(save_dir_checkpoints)
                 os.makedirs(save_dir_images)
                 os.makedirs(save_dir_tb)
-                copytree('./', os.path.join(save_dir.format(version, ''), 'code'),
-                    ignore=ignore_patterns('*.pyc', '.gitignore', 'tmp*', 'logs*', 'experiment_scripts*',
-                                            'notebook*', '.git*', '..ipynb_checkpoints*', '*.mp4', 'model_weights*'))
+                # copytree('./', os.path.join(save_dir.format(version, ''), 'code'),
+                #     ignore=ignore_patterns('*.pyc', '.gitignore', 'tmp*', 'logs*', 'experiment_scripts*',
+                #                             'notebook*', '.git*', '..ipynb_checkpoints*', '*.mp4', 'model_weights*'))
     if render_3d:
         if lod_flag:
             print('Extending EG3D')
@@ -380,12 +380,12 @@ def main(config):
                 if random() > min(0.4, 2*step/train_num_steps):
                     _, _, _, planes_old = model(input_feat, return_3d_features=True, render=False)
 
-                    rays_o = model.module.rays_o[None].repeat(bs, 1, 1).to(accelerator.device)
-                    rays_d = model.module.rays_d[None].repeat(bs, 1, 1).to(accelerator.device)
+                    rays_o = model.rays_o[None].repeat(bs, 1, 1).to(accelerator.device)
+                    rays_d = model.rays_d[None].repeat(bs, 1, 1).to(accelerator.device)
 
-                    x_canon, depth, w1, depth_ref = model.module.renderer(planes_old, model.module.decoder,
+                    x_canon, depth, w1, depth_ref = model.renderer(planes_old, model.decoder,
                                                     rays_o, rays_d,
-                                                    model.module.rendering_options, importance_depth=data['depth'])
+                                                    model.rendering_options, importance_depth=data['depth'])
 
                     x_canon = x_canon.permute(0,2,1).reshape(-1,3,image_size,image_size)
                     depth_ref = depth_ref[:,:,:,0].permute(0,2,1).reshape(bs,-1,image_size,image_size)
@@ -444,9 +444,9 @@ def main(config):
                     cam2w = compute_cam2world_matrix(camera_params).to(accelerator.device)
                     ray_origins, ray_directions = sample_rays(cam2w, fov_degrees, [image_size,image_size])
 
-                    x_novel, depth_novel, w1, depth_ref = model.module.renderer(planes_old, model.module.decoder,
+                    x_novel, depth_novel, w1, depth_ref = model.renderer(planes_old, model.decoder,
                                                     ray_origins, ray_directions,
-                                                    model.module.rendering_options)
+                                                    model.rendering_options)
                     depth_novel = depth_novel.permute(0,2,1).reshape(-1,1,image_size, image_size)
                     x_novel_128 = x_novel.permute(0,2,1).reshape(-1,3,image_size, image_size)
 
