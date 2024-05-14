@@ -1,19 +1,19 @@
 G3DR:
   seed: 420
-  unet_feature_dim: 64 # ignored if render is false 
+  unet_feature_dim: 32 # ignored if render is false 
   
   training:
     learning_rate: 5e-5
-    batch_size: 8
+    batch_size: 4
     # save_and_sample_every: 500
     save_and_sample_every: 5
     dataset: Imagenet
     train_num_steps: 10
-    dataset_folder: C:\Users\Deept\OneDrive\Desktop\Github\G3DR-main\G3DR-main\dataset
+    dataset_folder: /home/deept/single-image-to-3d/G3DR-main/dataset3
 
   rendering:
     render: True
-    renderer_path: C:\Users\Deept\OneDrive\Desktop\Github\G3DR-main\G3DR-main\eg3d-main\eg3d  # eg3d path
+    renderer_path: /home/deept/single-image-to-3d/G3DR-main/eg3d-main/eg3d  # eg3d path
     estimate_camera: False
     view_transform: True
     triplane_renderer_config:
